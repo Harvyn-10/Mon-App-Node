@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titre %></title>
+</head>
+<body>
+    <header>
+        <img src="/express-server/public/images/ -2.jpg" alt="Logo de l'université">
+        <nav>
+            <a href="/">Accueil</a>
+            <a href="/cours">Cours</a>
+        </nav>
+    </header>
+    <section>
+        <h1><%= titre %></h1>
+        <p><%= descriptif %></p>
+    </section>
+    <section>
+        <h2>Enseignants</h2>
+        <ul>
+            <% enseignants.forEach(enseignant => { %>
+                <li><%= enseignant %></li>
+            <% }) %>
+        </ul>
+    </section>
+    <footer>
+        Contact: <%= enseignants[0] %>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,25 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+header{
+    background-color: black;
+    color: white;
+}
+
+header a {
+    text-decoration: none;
+    color: white;
+    font-size: large;
+}
+
+header ul{
+    list-style: none;
+    display: inline-flex;
+    gap: 100px;
+    margin-left: 1050px;
+    padding: 20px;
+}
+

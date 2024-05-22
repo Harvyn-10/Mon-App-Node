@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./sign.css">
+  <title>Document</title>
+</head>
+<body>
+  <form action="http://localhost:8080/" method="POST" id="UserForm" style="border:1px solid #ccc">
+    <div class="container">
+      <h1>S'inscrire</h1><br><br>
+  
+      <label for="nom"><b>Nom: </b></label>
+      <input type="text" placeholder="Veuillez entrer votre nom" name="nom" id="nom" required><br>
+  
+      <label for="prenom"><b>Prénom: </b></label>
+      <input type="text" placeholder="Veuillez entrer votre prénom" name="prenom" id="prenom" required><br>
+  
+      <label for="login"><b>Login:</b></label>
+      <input type="text" placeholder="Veuillez entrer un Login" id="login" name="login" required><br>
+  
+      <label for="mdp"><b>Mot de passe:</b></label>
+      <input type="password" placeholder="Veuillez entrer votre mot de passe" id="mdp" name="mdp" required><br>
+  
+      <label for="confirmMdp"><b>Confirmez le mot de passe:</b></label>
+      <input type="password" placeholder="Veuillez confirmer votre mot de passe" id="confirmMdp" name="confirmMdp" required><br>
+      
+      <label>
+      <input id="checkbox" type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+      </label>
+      <br><br>  
+      <div class="clearfix">
+        <button type="submit" class="signupbtn">S'inscrire</button>
+      </div>
+      </p><a href="./login.html">Vous disposez déjà d'un compte?<span> Se connecter</span></a>
+    </div>
+  </form>
+  
+</body>
+</html>
+
