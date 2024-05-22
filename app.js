@@ -87,7 +87,7 @@ app.get('/private/mine', (req, res) => {
 });
 
 app.get('/pictures', (req, res) => {
-    const filePath = path.join(__dirname, 'express-server', 'public', 'images', '-2.jpg');
+    const filePath = path.join(__dirname, 'public', 'pexels-matt-hardy-2624109.jpg');
     res.sendFile(filePath, (err) => {
         if (err) {
             if (err.code === 'ENOENT') {
