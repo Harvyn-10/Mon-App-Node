@@ -1,0 +1,37 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+header{
+    background-color: black;
+    color: white;
+    display: flex;
+    width: 1500px;
+}
+
+header a {
+    text-decoration: none;
+    color: white;
+    font-size: large;
+}
+
+header img{
+    width: 80px;
+    padding: 20px;
+    border-radius: 50%;
+    float: right;
+    position: absolute;
+    right: 0;
+}
+
+header ul{
+    list-style: none;
+    display: inline-flex;
+    gap: 100px;
+    margin-left: 1200px;
+    padding: 30px;
+    width: 200px;
+}
+

@@ -4,29 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= titre %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <img src="/express-server/public/images/ -2.jpg" alt="Logo de l'université">
-        <nav>
-            <a href="/">Accueil</a>
-            <a href="/cours">Cours</a>
-        </nav>
-    </header>
-    <section>
+    <div class="container">
         <h1><%= titre %></h1>
         <p><%= descriptif %></p>
-    </section>
-    <section>
-        <h2>Enseignants</h2>
+        <h2>Enseignants :</h2>
         <ul>
-            <% enseignants.forEach(enseignant => { %>
+            <% enseignants.forEach(function(enseignant) { %>
                 <li><%= enseignant %></li>
-            <% }) %>
+            <% }); %>
         </ul>
-    </section>
-    <footer>
-        Contact: <%= enseignants[0] %>
-    </footer>
+    </div>
 </body>
 </html>

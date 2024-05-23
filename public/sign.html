@@ -7,7 +7,7 @@
   <title>Document</title>
 </head>
 <body>
-  <form action="http://localhost:8080/" method="POST" id="UserForm" style="border:1px solid #ccc">
+  <form action="http://localhost:8080/" method="POST" enctype="multipart/form-data" id="UserForm" style="border:1px solid #ccc">
     <div class="container">
       <h1>S'inscrire</h1><br><br>
   
@@ -16,6 +16,9 @@
   
       <label for="prenom"><b>Prénom: </b></label>
       <input type="text" placeholder="Veuillez entrer votre prénom" name="prenom" id="prenom" required><br>
+
+      <label for="avatar"><b>Avatar </b></label>
+      <input type="file" placeholder="Veuillez entrer votre avatar" name="avatar" id="avatar" required><br><br>
   
       <label for="login"><b>Login:</b></label>
       <input type="text" placeholder="Veuillez entrer un Login" id="login" name="login" required><br>

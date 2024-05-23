@@ -1,17 +1,27 @@
 const express = require('express');
-
 const path = require('path');
-
 const bodyParser = require('body-parser');
-
 const mongoose = require('mongoose');
-
-const bcrypt = require('bcryptjs')
-
+const bcrypt = require('bcryptjs');
+const multer = require('multer');
 const app = express();
-
 const port = 8080;
 
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 mongoose.connect('mongodb://localhost:27017/Users', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie'))
@@ -21,6 +31,7 @@ mongoose.connect('mongodb://localhost:27017/Users', { useNewUrlParser: true, use
 const userSchema = new mongoose.Schema({
     nom: String,
     prenom: String,
+    avatar:String,
     login: String,
     mdp: String
 });
@@ -43,9 +54,6 @@ userSchema.pre('save', async function (next) {
 const User = mongoose.model('User', userSchema);
 
 
-app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 const coursData = {
     1: { titre: 'Mathématiques', descriptif: 'Cours de mathématiques avancées', enseignants: ['Prof. Dupont', 'Prof. Martin'] },
@@ -72,29 +80,33 @@ app.get('/sign.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sign.html'));
 });
 
-app.post('/', async (req, res) => {
+app.get('/user.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'user.html'));
+});
+
+app.post('/', upload.single('avatar'), async (req, res) => {
     const { nom, prenom, login, mdp, confirmMdp } = req.body;
     if (mdp !== confirmMdp) {
         return res.send('Les mots de passe ne correspondent pas. Veuillez réessayer.');
     }
-
     try {
-        let user = await User.findOne({ nom, prenom });
-        if (user) {
-            user.login = login;
-            user.mdp = mdp;
-            await user.save();
-            res.send(`Bonjour ${prenom} ${nom}, votre compte a été mis à jour.`);
-        } else {
-            user = new User({ nom, prenom, login, mdp });
-            await user.save();
-            res.send(`Bonjour ${prenom} ${nom}, ton compte est bien créé.`);
-        }
+        const imagePath = req.file.path;
+        const user = new User({
+            nom,
+            prenom,
+            avatar: imagePath,
+            login,
+            mdp
+        });
+        await user.save();
+        res.redirect('./success.html')
     } catch (err) {
-        console.error('Erreur lors de la gestion de l\'utilisateur:', err);
+        console.error('Erreur lors de la création de l\'utilisateur:', err);
         res.status(500).send('Erreur interne du serveur');
     }
 });
+
+
 
 app.get('/about', (req, res) => {
     console.log('envoie des infos');
