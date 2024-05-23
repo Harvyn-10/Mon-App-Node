@@ -1,16 +1,23 @@
 const express = require('express');
+
 const path = require('path');
+
 const bodyParser = require('body-parser');
+
 const mongoose = require('mongoose');
+
+const bcrypt = require('bcryptjs')
+
 const app = express();
+
 const port = 8080;
 
-// Connexion à MongoDB
+
 mongoose.connect('mongodb://localhost:27017/Users', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie'))
     .catch(err => console.error('Erreur de connexion à MongoDB', err));
 
-// Définir le schéma de l'utilisateur
+
 const userSchema = new mongoose.Schema({
     nom: String,
     prenom: String,
@@ -18,7 +25,23 @@ const userSchema = new mongoose.Schema({
     mdp: String
 });
 
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.isModified('mdp')) {
+        try {
+            const salt = await bcrypt.genSalt(10);
+            user.mdp = await bcrypt.hash(user.mdp, salt);
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+});
+
 const User = mongoose.model('User', userSchema);
+
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -120,5 +143,5 @@ app.use((req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Serveur démarré sur http://localhost:${port}`);
+    console.log(`Serveur démarré sur le port ${port}`);
 });
