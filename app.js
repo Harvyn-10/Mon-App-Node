@@ -1,3 +1,5 @@
+// Initialisation des modules et des paramètres
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -7,10 +9,14 @@ const multer = require ('multer')
 const app = express();
 const port = 8080;
 
+// Configuration d'Express et de Multer 
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configuration de Multer pour la gestion des téléchargements de fichiers
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -23,10 +29,13 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Connexion à la base de donnée
+
 mongoose.connect('mongodb://localhost:27017/Users', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie'))
     .catch(err => console.error('Erreur de connexion à MongoDB', err));
 
+// Schéma Mongoose pour les utilisateurs
 
 const userSchema = new mongoose.Schema({
     nom: String,
@@ -35,6 +44,8 @@ const userSchema = new mongoose.Schema({
     login: String,
     mdp: String
 });
+
+// Hashage des mots de passe des utilisateurs dans la base de donnée avant de les sauvegarder
 
 userSchema.pre('save', async function (next) {
     const user = this;
@@ -51,9 +62,11 @@ userSchema.pre('save', async function (next) {
     }
 });
 
+// Modèle Mongoose pour les utilisateurs
+
 const User = mongoose.model('User', userSchema);
 
-
+// Les données pour les cours
 
 const coursData = {
     1: { titre: 'Mathématiques', descriptif: 'Cours de mathématiques avancées', enseignants: ['Prof. Dupont', 'Prof. Martin'] },
@@ -63,10 +76,14 @@ const coursData = {
     5: { titre: 'Philosophie', descriptif: 'Cours de philosophie', enseignants: ['Prof. Marc', 'Prof. Arthur'] },
 };
 
+// Pour l'afichage des routes demandées
+
 app.use((req, res, next) => {
     console.log(`Route demandée : ${req.url}`);
     next();
 });
+
+// Les routes GET pour les différentes pages html
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -84,18 +101,26 @@ app.get('/user.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
+// Ma route POST pour l'inscription d'un nouvel utilisateur
+
 app.post('/sign', upload.single('avatar'), async (req, res) => {
     const { nom, prenom, login, mdp, confirmMdp } = req.body;
     
+    // Vérifier si les mots de passe correspondent
+
     if (mdp !== confirmMdp) {
        return res.redirect('./!mdp.html')
     }
 
+    // Vérifier si le login d'un utilisateur est déjà utilisé donc enregistré dans la base de donnée
+    
     try {
-        const existingUser = await User.findOne({ login });
-        if (existingUser) {
+        const userExist = await User.findOne({ login });
+        if (userExist) {
             return res.redirect('./UsedLogin.html');
         }
+
+        // Pour la création d'un nouvel utilisateur avec les différentes informations dont il possède
 
         const imagePath = req.file ? './uploads/' + req.file.path : './uploads/';
         const user = new User({
@@ -113,9 +138,13 @@ app.post('/sign', upload.single('avatar'), async (req, res) => {
     }
 });
 
+// Ma route POST pour la connexion d'un utilisateur 
 
 app.post('/login', async (req, res) => {
     const { Login, mdp } = req.body;
+
+    // Vérifier si l'utilisateur existe dans la base de donnée
+
     try {
         const user = await User.findOne({ login: Login });
         if (user && await bcrypt.compare(mdp, user.mdp)) {
@@ -129,6 +158,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Les autres routes demandées
 
 app.get('/about', (req, res) => {
     console.log('envoie des infos');
@@ -142,6 +172,8 @@ app.get('/private', (req, res) => {
 app.get('/private/mine', (req, res) => {
     res.send('Ma section privée');
 });
+
+// Ma route pour le téléchargement d'une image
 
 app.get('/pictures', (req, res) => {
     const filePath = path.join(__dirname, 'public', 'pexels-matt-hardy-2624109.jpg');
@@ -158,6 +190,8 @@ app.get('/pictures', (req, res) => {
     });
 });
 
+// Ma route pour afficher la description d'un cours
+
 app.get('/cours/:numeroducours/descr', (req, res) => {
     const numeroDuCours = req.params.numeroducours;
     const cours = coursData[numeroDuCours];
@@ -172,9 +206,13 @@ app.get('/cours/:numeroducours/descr', (req, res) => {
     }
 });
 
+// Pour pouvoir gérer les routes qui ne sont pas trouvées
+
 app.use((req, res) => {
     res.status(404).send('Page non trouvée');
 });
+
+// Pour le démarrage du serveur
 
 app.listen(port, () => {
     console.log(`Serveur démarré sur le port ${port}`);
