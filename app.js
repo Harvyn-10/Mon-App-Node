@@ -3,7 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const multer = require('multer');
+const multer = require ('multer')
 const app = express();
 const port = 8080;
 
@@ -84,13 +84,13 @@ app.get('/user.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
-app.post('/', upload.single('avatar'), async (req, res) => {
+app.post('/sign', upload.single('avatar'), async (req, res) => {
     const { nom, prenom, login, mdp, confirmMdp } = req.body;
     if (mdp !== confirmMdp) {
         return res.send('Les mots de passe ne correspondent pas. Veuillez réessayer.');
     }
     try {
-        const imagePath = req.file.path;
+        const imagePath = req.file ? './uploads/' + req.file.path : './uploads/' ;
         const user = new User({
             nom,
             prenom,
@@ -106,6 +106,20 @@ app.post('/', upload.single('avatar'), async (req, res) => {
     }
 });
 
+app.post('/login', async (req, res) => {
+    const { Login, mdp } = req.body;
+    try {
+        const user = await User.findOne({ login: Login });
+        if (user && await bcrypt.compare(mdp, user.mdp)) {
+            res.redirect('./succeed.html')
+        } else {
+            res.send('Login ou mot de passe incorrect');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la tentative de connexion:', error);
+        res.status(500).send('Erreur interne du serveur');
+    }
+});
 
 
 app.get('/about', (req, res) => {
