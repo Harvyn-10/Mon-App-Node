@@ -86,11 +86,18 @@ app.get('/user.html', (req, res) => {
 
 app.post('/sign', upload.single('avatar'), async (req, res) => {
     const { nom, prenom, login, mdp, confirmMdp } = req.body;
+    
     if (mdp !== confirmMdp) {
-        return res.send('Les mots de passe ne correspondent pas. Veuillez réessayer.');
+       return res.redirect('./!mdp.html')
     }
+
     try {
-        const imagePath = req.file ? './uploads/' + req.file.path : './uploads/' ;
+        const existingUser = await User.findOne({ login });
+        if (existingUser) {
+            return res.redirect('./UsedLogin.html');
+        }
+
+        const imagePath = req.file ? './uploads/' + req.file.path : './uploads/';
         const user = new User({
             nom,
             prenom,
@@ -99,12 +106,13 @@ app.post('/sign', upload.single('avatar'), async (req, res) => {
             mdp
         });
         await user.save();
-        res.redirect('./success.html')
+        res.redirect('./success.html');
     } catch (err) {
         console.error('Erreur lors de la création de l\'utilisateur:', err);
         res.status(500).send('Erreur interne du serveur');
     }
 });
+
 
 app.post('/login', async (req, res) => {
     const { Login, mdp } = req.body;
@@ -113,7 +121,7 @@ app.post('/login', async (req, res) => {
         if (user && await bcrypt.compare(mdp, user.mdp)) {
             res.redirect('./succeed.html')
         } else {
-            res.send('Login ou mot de passe incorrect');
+            res.redirect('./!Login.html')
         }
     } catch (error) {
         console.error('Erreur lors de la tentative de connexion:', error);
